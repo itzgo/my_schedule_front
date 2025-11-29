@@ -19,16 +19,18 @@ st.markdown("""
         background-color: #f8f9fa;
     }
     
-    /* Cards dos dias */
+    /* Cards dos dias - MELHORADO */
     .day-card {
-        background: white;
+        background: #252440;
         border-radius: 12px;
         padding: 12px;
         margin: 2px;
         border: 2px solid #e9ecef;
         transition: all 0.3s ease;
-        height: 120px;
+        height: 140px; /* Aumentado para melhor visualização */
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     
     .day-card:hover {
@@ -39,17 +41,23 @@ st.markdown("""
     
     .day-card.today {
         border-color: #FF6B6B;
-        background: linear-gradient(135deg, #fff5f5, #ffffff);
+        background: #252440;
     }
     
     .day-card.weekend {
-        background: linear-gradient(135deg, #f8f9fa, #ffffff);
+        background: #252440;
+    }
+    
+    .day-card.empty {
+        background: #252440;
+        border: 2px dashed #dee2e6;
     }
     
     .day-number {
         font-weight: bold;
         font-size: 16px;
         margin-bottom: 8px;
+        color: #495057;
     }
     
     .day-number.today {
@@ -57,27 +65,79 @@ st.markdown("""
         font-weight: 800;
     }
     
+    .day-number.weekend {
+        color: #6c757d;
+    }
+    
+    /* Eventos - MELHORADO */
+    .events-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        max-height: 80px;
+        margin-bottom: 8px;
+    }
+    
     .event-item {
-        font-size: 10px;
-        margin: 2px 0;
-        padding: 2px 4px;
-        border-radius: 4px;
-        background: #f1f3f4;
+        font-size: 11px; /* Aumentado para melhor legibilidade */
+        margin: 3px 0;
+        padding: 4px 6px;
+        border-radius: 6px;
+        background: #070a1a;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        border-left: 4px solid;
+        font-weight: 500;
     }
     
-    .event-private {
-        border-left: 3px solid #4ECDC4;
+    .event-privado {
+        border-left-color: #4ECDC4;
+        background: #252440;
     }
     
-    .event-class {
-        border-left: 3px solid #FFD166;
+    .event-aula {
+        border-left-color: #FFD166;
+        background: #252440;
     }
     
-    .event-public {
-        border-left: 3px solid #06D6A0;
+    .event-público {
+        border-left-color: #06D6A0;
+        background: #252440;
+    }
+    
+    .empty-state {
+        font-size: 11px;
+        color: #252440;
+        text-align: center;
+        margin-top: 15px;
+        font-style: italic;
+    }
+    
+    .more-events {
+        font-size: 10px;
+        color: #4ECDC4;
+        text-align: center;
+        margin: 4px 0;
+        font-weight: 600;
+    }
+    
+    /* Botão de adicionar evento - MELHORADO */
+    .add-event-btn {
+        background: transparent;
+        border: 1px dashed #dee2e6;
+        border-radius: 6px;
+        color: #6c757d;
+        padding: 4px;
+        font-size: 12px;
+        width: 100%;
+        transition: all 0.2s ease;
+        margin-top: auto;
+    }
+    
+    .add-event-btn:hover {
+        background: #f8f9fa;
+        border-color: #4ECDC4;
+        color: #4ECDC4;
     }
     
     /* Header do mês */
@@ -129,11 +189,17 @@ st.markdown("""
     .stButton button {
         border-radius: 8px;
         font-weight: 500;
+        transition: all 0.2s ease;
     }
     
     .stButton button[kind="primary"] {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
+        border: none;
+    }
+    
+    .stButton button[kind="secondary"] {
+        border: 1px solid #dee2e6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -157,11 +223,18 @@ if 'events' not in st.session_state:
             "color": "#4ECDC4"
         },
         {
-            "title": "Aula de Python",
+            "title": "Aula de Python - Programação Avançada",
             "start": datetime.datetime(2024, 1, 16, 9, 0),
             "end": datetime.datetime(2024, 1, 16, 11, 0),
             "type": "class",
             "color": "#FFD166"
+        },
+        {
+            "title": "Workshop de Desenvolvimento Web",
+            "start": datetime.datetime(2024, 1, 20, 10, 0),
+            "end": datetime.datetime(2024, 1, 20, 12, 0),
+            "type": "public",
+            "color": "#06D6A0"
         }
     ]
 
@@ -209,7 +282,10 @@ def render_sidebar():
         for event in upcoming_events[:5]:
             event_date = event['start'].strftime('%d/%m')
             event_time = event['start'].strftime('%H:%M')
-            st.caption(f"• {event['title']} - {event_date} {event_time}")
+            
+            # Definir ícone baseado no tipo
+            event_icon = "🔵" if event['type'] == 'private' else "🟡" if event['type'] == 'class' else "🟢"
+            st.caption(f"{event_icon} {event['title']} - {event_date} {event_time}")
         
         if not upcoming_events:
             st.caption("Nenhum evento próximo")
@@ -349,7 +425,7 @@ def event_modal():
                 st.markdown("</div>", unsafe_allow_html=True)
 
 def render_beautiful_calendar():
-    """Calendário bonito e funcional"""
+    """Calendário bonito e funcional - VERSÃO MELHORADA"""
     # Header do mês com gradiente
     month_name = py_calendar.month_name[st.session_state.current_month]
     
@@ -395,7 +471,7 @@ def render_beautiful_calendar():
         for i, day in enumerate(week):
             with cols[i]:
                 if day == 0:
-                    st.write("")  # Dia vazio
+                    st.markdown('<div class="day-card empty"></div>', unsafe_allow_html=True)
                 else:
                     current_date = date(st.session_state.current_year, st.session_state.current_month, day)
                     day_events = get_events_for_date(current_date)
@@ -411,26 +487,36 @@ def render_beautiful_calendar():
                     st.markdown(f'<div class="{css_class}">', unsafe_allow_html=True)
                     
                     # Número do dia
-                    day_class = "day-number today" if current_date == today else "day-number"
+                    day_class = "day-number today" if current_date == today else "day-number weekend" if i >= 5 else "day-number"
                     st.markdown(f'<div class="{day_class}">{day}</div>', unsafe_allow_html=True)
                     
+                    # Container de eventos
+                    st.markdown('<div class="events-container">', unsafe_allow_html=True)
+                    
                     # Eventos do dia
-                    for event in day_events[:3]:  # Mostrar até 3 eventos
-                        event_class = f"event-item event-{event['type']}"
-                        event_title = event['title'][:15] + "..." if len(event['title']) > 15 else event['title']
-                        st.markdown(f'<div class="{event_class}">• {event_title}</div>', unsafe_allow_html=True)
+                    if day_events:
+                        for event in day_events[:3]:  # Mostrar até 3 eventos
+                            event_class = f"event-item event-{event['type']}"
+                            # Truncar título se necessário, mas manter mais caracteres
+                            event_title = event['title'][:20] + "..." if len(event['title']) > 20 else event['title']
+                            st.markdown(f'<div class="{event_class}" title="{event["title"]}">• {event_title}</div>', unsafe_allow_html=True)
+                        
+                        # Indicador de mais eventos
+                        if len(day_events) > 3:
+                            st.markdown(f'<div class="more-events">+{len(day_events)-3} mais</div>', unsafe_allow_html=True)
+                    else:
+                        # Estado vazio melhorado
+                        st.markdown('<div class="empty-state">Sem eventos</div>', unsafe_allow_html=True)
                     
-                    # Indicador de mais eventos
-                    if len(day_events) > 3:
-                        st.markdown(f'<div style="font-size: 9px; color: #666; text-align: center;">+{len(day_events)-3} mais</div>', unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)  # Fecha events-container
                     
-                    # Botão para adicionar evento
-                    if st.button("＋", key=f"add_{day}", help=f"Criar evento em {day}/{st.session_state.current_month}", use_container_width=True):
+                    # Botão para adicionar evento - MELHORADO
+                    if st.button("＋ Adicionar", key=f"add_{day}", help=f"Criar evento em {day}/{st.session_state.current_month}", use_container_width=True):
                         st.session_state.selected_date = current_date
                         st.session_state.show_event_modal = True
                         st.rerun()
                     
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)  # Fecha day-card
 
 def main():
     render_sidebar()
@@ -458,9 +544,12 @@ def main():
         
         render_beautiful_calendar()
         
-        # Legenda
+        # Legenda melhorada
         st.markdown("---")
-        st.markdown("**🎨 Legenda:** 🔵 **Privado** - Apenas você vê | 🟡 **Aula** - Alunos convidados | 🟢 **Público** - Todos veem")
+        st.markdown("""
+        **🎨 Legenda:** 
+        🔵 **Privado** - Apenas você vê | 🟡 **Aula** - Alunos convidados | 🟢 **Público** - Todos veem
+        """)
         
     else:
         # Quando o modal está aberto, mostramos apenas o modal centralizado
