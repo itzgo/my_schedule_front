@@ -3,7 +3,7 @@ from utils.calendar_utils import render_calendar, handle_callback
 from components.event_form import show_event_form
 from utils.storage import load_events, save_events
 
-st.set_page_config(page_title="Agenda Universitária", layout="centered")
+st.set_page_config(page_title="Agenda Universitária", layout="wide")
 st.title("Agenda Universitária")
 
 # Inicialização
