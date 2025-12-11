@@ -20,7 +20,7 @@ def show_event_form():
         if not evento:
             st.error("Evento não encontrado. Recarregando IDs...")
             st.rerun()
-        data_br = datetime.strptime(evento["data"], "%Y-%m-%d").strftime("%d/%m/%Y")
+        data_br = datetime.strptime(evento["date"], "%Y-%m-%d").strftime("%d/%m/%Y")
         st.subheader(f"Editar evento – {data_br}")
     else:
         data = st.session_state.data_temp

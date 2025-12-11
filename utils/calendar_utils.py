@@ -26,14 +26,16 @@ def to_calendar_events():
         # Garante ID válido
         if "id" not in ev or not ev["id"]:
             ev["id"] = str(uuid.uuid4())
+
         eventos_cal.append({
             "id": ev["id"],
-            "title": f"{ev['titulo']} ({ev['hora_inicio']}–{ev['hora_fim']})",
-            "start": f"{ev['data']}T{ev['hora_inicio']}:00",
-            "end": f"{ev['data']}T{ev['hora_fim']}:00",
-            "backgroundColor": ev.get("cor", "#95a5a6"),
+            "title": f"{ev['title']} ({ev['start_time']}–{ev['end_time']})",
+            "start": f"{ev['date']}T{ev['start_time']}:00",
+            "end": f"{ev['date']}T{ev['end_time']}:00",
+            "backgroundColor": ev.get("color", "#95a5a6"),
             "textColor": "white",
         })
+
     return eventos_cal
 
 def render_calendar():
