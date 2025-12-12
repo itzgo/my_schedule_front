@@ -1,4 +1,4 @@
-# components/event_form.py
+
 import streamlit as st
 from datetime import datetime, time
 from utils.storage import save_events
@@ -34,6 +34,8 @@ def show_event_form():
         inicio = col1.time_input("Início *", value=time.fromisoformat(evento.get("hora_inicio", "08:00")))
         fim = col2.time_input("Fim *", value=time.fromisoformat(evento.get("hora_fim", "10:00")))
         local = st.text_input("Local", value=evento.get("local", ""))
+        cor = st.color_picker("Cor", "#667eea")
+
         
         cor_atual = evento.get("cor", list(CORES.values())[0])
         cor_nome = st.selectbox("Tipo de evento", options=list(CORES.keys()),
@@ -82,6 +84,7 @@ def show_event_form():
                 st.session_state.evento_id_selecionado = None
                 if "data_temp" in st.session_state:
                     del st.session_state.data_temp
+                st.session_state.show_add_evento = False 
                 st.rerun()
 
     # EXCLUSÃO — FINALMENTE FUNCIONA!
