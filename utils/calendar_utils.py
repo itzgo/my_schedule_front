@@ -17,7 +17,45 @@ OPTIONS = {
     "initialView": "dayGridMonth",
     "selectable": False,
     "locale": "pt-br",
-    "height": "auto",
+    "height": 850,
+    "contentHeight": 800,
+    "aspectRatio": 2.0,
+    "expandRows": True,
+    "dayMaxEvents": True,
+    "eventMinWidth": 100,
+    "eventShortHeight": 30,
+    # Melhorias estéticas
+    "eventBorderColor": "transparent",  # Remove bordas duras
+    "eventBackgroundColor": "#ffffff",  # Fundo branco para eventos (ou customize por cor)
+    "eventTextColor": "#333333",        # Texto escuro para legibilidade
+    "eventDisplay": "block",            # Eventos em bloco bonito
+    "moreLinkText": "+ mais",           # Texto em português para "+X mais"
+    "editable": False,                  # Desativa drag/drop (opcional)
+    "themeSystem": "standard",          # Tema padrão mais clean
+    "views": {
+        "dayGridMonth": {
+            "dayHeaderFormat": { "weekday": "short", "day": "numeric" },  # Cabeçalho curto e bonito
+            "weekNumbers": False
+        }
+    }
+}
+
+pOPTIONS = {
+    "headerToolbar": {
+        "left": "prev,next today",
+        "center": "title",
+        "right": "dayGridMonth,timeGridWeek,timeGridDay"
+    },
+    "initialView": "dayGridMonth",
+    "selectable": False,
+    "locale": "pt-br",
+    "height": 800,              # ← Calendário bem maior
+    "contentHeight": 750,       # ← Mais espaço interno
+    "aspectRatio": 1.8,         # ← Proporção perfeita
+    "expandRows": True,         # ← Linhas se expandem
+    "dayMaxEvents": True,       # ← Mostra "+X mais" se necessário
+    "eventMinWidth": 100,
+    "eventShortHeight": 30,
 }
 
 def to_calendar_events():
