@@ -18,7 +18,7 @@ def render_sidebar():
     
         opcao = st.radio(
             "Navegação",  
-            ["📅 Calendário", "📊 Resumo do Dia", "📚 Minhas Disciplinas"],
+            ["Calendário", "Resumo do Dia", "Minhas Disciplinas"],
             label_visibility="collapsed" 
         )
 
@@ -29,7 +29,7 @@ def render_sidebar():
         st.markdown("---")
         
         #Notificações
-        st.markdown("### 🔔 Notificações")
+        st.markdown("###  Notificações")
         
         tem_notificacao = False
         
@@ -51,7 +51,7 @@ def render_sidebar():
             eventos_hoje = [e for e in st.session_state.eventos if e.get('data') == hoje]
             for evt in eventos_hoje:
                 tem_notificacao = True
-                st.info(f"📌 {evt['titulo']} às {evt.get('hora_inicio', 'N/A')}")
+                st.info(f" {evt['titulo']} às {evt.get('hora_inicio', 'N/A')}")
         
         if not tem_notificacao:
             st.caption("Nenhuma notificação no momento")

@@ -46,15 +46,15 @@ def render_perfil_page():
             col_salvar, col_cancelar = st.columns([1, 1])
             
             with col_salvar:
-                salvar_pessoal = st.form_submit_button("💾 Salvar Alterações", type="primary", use_container_width=True)
+                salvar_pessoal = st.form_submit_button(" Salvar Alterações", type="primary", use_container_width=True)
             
             with col_cancelar:
-                cancelar_pessoal = st.form_submit_button("❌ Cancelar", use_container_width=True)
+                cancelar_pessoal = st.form_submit_button(" Cancelar", use_container_width=True)
             
             if salvar_pessoal:
                 st.session_state.user_data["nome"] = nome
                 st.session_state.user_data["telefone"] = telefone
-                st.success("✅ Dados pessoais atualizados com sucesso!")
+                st.success(" Dados pessoais atualizados com sucesso!")
             
             if cancelar_pessoal:
                 st.rerun()
@@ -82,10 +82,10 @@ def render_perfil_page():
             col_salvar2, col_cancelar2 = st.columns([1, 1])
             
             with col_salvar2:
-                salvar_academico = st.form_submit_button("💾 Salvar Alterações", type="primary", use_container_width=True)
+                salvar_academico = st.form_submit_button(" Salvar Alterações", type="primary", use_container_width=True)
             
             with col_cancelar2:
-                cancelar_academico = st.form_submit_button("❌ Cancelar", use_container_width=True)
+                cancelar_academico = st.form_submit_button(" Cancelar", use_container_width=True)
             
             if salvar_academico:
                 st.session_state.user_data["curso"] = curso
@@ -93,14 +93,14 @@ def render_perfil_page():
                 st.session_state.user_data["semestre"] = semestre
                 if data_ingresso:
                     st.session_state.user_data["data_ingresso"] = str(data_ingresso)
-                st.success("✅ Dados acadêmicos atualizados com sucesso!")
+                st.success(" Dados acadêmicos atualizados com sucesso!")
             
             if cancelar_academico:
                 st.rerun()
     
     # Card de resumo
     st.markdown("---")
-    st.markdown("### 📊 Resumo da Conta")
+    st.markdown("###  Resumo da Conta")
     
     col1, col2, col3 = st.columns(3)
     
