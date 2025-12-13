@@ -1,11 +1,12 @@
 import streamlit as st
+import requests
 from utils.calendar_utils import render_calendar, handle_callback
 from components.event_form import show_event_form
 from components.sidebar_menu import render_sidebar
 from pages.perfil import render_perfil_page  
 from datetime import datetime
 from utils.storage import load_events, save_events
-
+from pages.url import URL_BASE, ADMIN_EVENTOS_PUB
 
 # Configuracoes
 st.set_page_config(
@@ -57,9 +58,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# ----------------------------------------------------------
+# 1) Função para buscar eventos da API
+# ----------------------------------------------------------
+def fetch_eventos():
+    try:
+        resp = requests.get(URL_BASE + ADMIN_EVENTOS_PUB)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        st.error(f"Erro ao buscar eventos da API: {e}")
+        return []
+
 # Inicialização
 if "eventos" not in st.session_state:
-    st.session_state.eventos = load_events()
+    # st.session_state.eventos = load_events()
+    st.session_state.eventos = fetch_eventos()
 
 if "disciplinas" not in st.session_state:
     st.session_state.disciplinas = [
@@ -75,7 +89,6 @@ opcao_menu = render_sidebar()
 
 if st.session_state.get("pagina_atual") == "👤 Perfil":
     render_perfil_page()
-
 else:
     st.session_state.pagina_atual = opcao_menu
     
@@ -103,7 +116,7 @@ else:
         st.title("Resumo do Dia")
         
         hoje = datetime.now().strftime("%Y-%m-%d")
-        eventos_hoje = [e for e in st.session_state.eventos if e.get('data') == hoje]
+        eventos_hoje = [e for e in st.session_state.eventos if e.get('date') == hoje]
         
         st.markdown("###  Eventos de Hoje")
         if eventos_hoje:
@@ -111,8 +124,8 @@ else:
                 st.markdown(f"""
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                      padding: 15px; border-radius: 10px; margin: 10px 0; color: white;">
-                    <h4 style="margin: 0;">{evt['titulo']}</h4>
-                    <p style="margin: 5px 0;"> {evt.get('hora_inicio')} - {evt.get('hora_fim')}</p>
+                    <h4 style="margin: 0;">{evt['title']}</h4>
+                    <p style="margin: 5px 0;"> {evt.get('start_time')} - {evt.get('end_time')}</p>
                     <p style="margin: 0;"> {evt.get('local', 'Sem local definido')}</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -150,8 +163,10 @@ else:
 
     # Rodapé
     st.markdown("---")
-    st.caption(f"Total de eventos: {len(st.session_state.eventos)} | "
-               "Clique no dia → criar | Clique no evento → editar/excluir")
+    st.caption(
+        f"Total de eventos: {len(st.session_state.eventos)} | "
+        "Clique no dia → criar | Clique no evento → editar/excluir"
+    )
 
 # CSS
 st.markdown(
