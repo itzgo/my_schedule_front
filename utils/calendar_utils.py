@@ -40,24 +40,6 @@ OPTIONS = {
     }
 }
 
-pOPTIONS = {
-    "headerToolbar": {
-        "left": "prev,next today",
-        "center": "title",
-        "right": "dayGridMonth,timeGridWeek,timeGridDay"
-    },
-    "initialView": "dayGridMonth",
-    "selectable": False,
-    "locale": "pt-br",
-    "height": 800,              # ← Calendário bem maior
-    "contentHeight": 750,       # ← Mais espaço interno
-    "aspectRatio": 1.8,         # ← Proporção perfeita
-    "expandRows": True,         # ← Linhas se expandem
-    "dayMaxEvents": True,       # ← Mostra "+X mais" se necessário
-    "eventMinWidth": 100,
-    "eventShortHeight": 30,
-}
-
 def to_calendar_events():
     eventos_cal = []
     for ev in st.session_state.eventos:

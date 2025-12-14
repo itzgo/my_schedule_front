@@ -1,12 +1,14 @@
 import streamlit as st
-import requests
 from utils.calendar_utils import render_calendar, handle_callback
 from components.event_form import show_event_form
 from components.sidebar_menu import render_sidebar
 from pages.perfil import render_perfil_page  
 from datetime import datetime
-from utils.storage import load_events, save_events
-from pages.url import URL_BASE, ADMIN_EVENTOS_PUB
+from pages.url import USER_ID_FIXO
+from utils.api_events import listar_eventos_por_usuario
+
+if "user_id" not in st.session_state:
+    st.session_state.user_id = USER_ID_FIXO
 
 # Configuracoes
 st.set_page_config(
@@ -24,15 +26,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<style>
-/* Aumenta o espaço no topo da página */
-.block-container {
-    padding-top: 2rem !important;
-}
-</style>
+    <style>
+    /* Aumenta o espaço no topo da página */
+    .block-container {
+        padding-top: 2rem !important;
+    }
+    </style>
 """, unsafe_allow_html=True)
-
-
 # CSS para esconder menu padrão e ajustar layout
 st.markdown("""
     <style>
@@ -57,116 +57,6 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
-# ----------------------------------------------------------
-# 1) Função para buscar eventos da API
-# ----------------------------------------------------------
-def fetch_eventos():
-    try:
-        resp = requests.get(URL_BASE + ADMIN_EVENTOS_PUB)
-        resp.raise_for_status()
-        return resp.json()
-    except Exception as e:
-        st.error(f"Erro ao buscar eventos da API: {e}")
-        return []
-
-# Inicialização
-if "eventos" not in st.session_state:
-    # st.session_state.eventos = load_events()
-    st.session_state.eventos = fetch_eventos()
-
-if "disciplinas" not in st.session_state:
-    st.session_state.disciplinas = [
-        {'nome': 'Matemática', 'faltas': 3, 'total': 40},
-        {'nome': 'História', 'faltas': 6, 'total': 40},
-    ]
-
-if "pagina_atual" not in st.session_state:
-    st.session_state.pagina_atual = "Calendário"
-
-# Renderizar sidebar e capturar opção selecionada
-opcao_menu = render_sidebar()
-
-if st.session_state.get("pagina_atual") == "👤 Perfil":
-    render_perfil_page()
-else:
-    st.session_state.pagina_atual = opcao_menu
-    
-    if opcao_menu == "Calendário":
-        # Botões etc só do calendário
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            st.title("Agenda Universitária")
-        with col2:
-            if st.button("➕ Adicionar Evento"):
-                st.session_state.modo = "criar"
-                st.session_state.data_temp = datetime.now().strftime("%Y-%m-%d")
-        
-        # Renderiza o calendário
-        callback = render_calendar()
-        handle_callback(callback)
-        
-        # Mostra formulário se estiver em modo criar/editar
-        if st.session_state.get("modo") in ["criar", "editar"]:
-            titulo_expander = "➕ Novo Evento" if st.session_state.get("modo") == "criar" else "✏️ Editar Evento"
-            with st.expander(titulo_expander, expanded=True):
-                show_event_form()
-
-    elif opcao_menu == "Resumo do Dia":
-        st.title("Resumo do Dia")
-        
-        hoje = datetime.now().strftime("%Y-%m-%d")
-        eventos_hoje = [e for e in st.session_state.eventos if e.get('date') == hoje]
-        
-        st.markdown("###  Eventos de Hoje")
-        if eventos_hoje:
-            for evt in eventos_hoje:
-                st.markdown(f"""
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                     padding: 15px; border-radius: 10px; margin: 10px 0; color: white;">
-                    <h4 style="margin: 0;">{evt['title']}</h4>
-                    <p style="margin: 5px 0;"> {evt.get('start_time')} - {evt.get('end_time')}</p>
-                    <p style="margin: 0;"> {evt.get('local', 'Sem local definido')}</p>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("Nenhum evento para hoje")
-        
-        st.markdown("###  Aulas de Hoje")
-        for disc in st.session_state.disciplinas[:3]:
-            porcentagem = (disc['faltas'] / disc['total']) * 100
-            cor_borda = "#e74c3c" if porcentagem > 20 else "#2ecc71"
-            st.markdown(f"""
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; 
-                 margin: 8px 0; border-left: 4px solid {cor_borda}; color: #212529;">
-                <p style="margin: 0; color: #495057;"><strong>{disc['nome']}</strong> - Faltas: {disc['faltas']}/{disc['total']}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-    elif opcao_menu == "Minhas Disciplinas":
-        st.title("Minhas Disciplinas")
-        
-        for disc in st.session_state.disciplinas:
-            porcentagem = (disc['faltas'] / disc['total']) * 100
-            cor = "🔴" if porcentagem > 20 else "🟢"
-            cor_borda = "#e74c3c" if porcentagem > 20 else "#2ecc71"
-            
-            st.markdown(f"""
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; 
-                 margin: 12px 0; border-left: 5px solid {cor_borda}; color: #212529;">
-                <h3 style="color: #343a40; margin-top: 0;">{cor} {disc['nome']}</h3>
-                <p style="color: #495057; font-size: 18px; margin-bottom: 0;">
-                    Faltas: <strong>{disc['faltas']}/{disc['total']}</strong> ({porcentagem:.1f}%)
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-    # Rodapé
-    st.markdown("---")
-    st.caption(
-        f"Total de eventos: {len(st.session_state.eventos)} | "
-        "Clique no dia → criar | Clique no evento → editar/excluir"
-    )
 
 # CSS
 st.markdown(
@@ -221,3 +111,111 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+# Função para buscar eventos da API
+if "eventos" not in st.session_state:
+    try:
+        st.session_state.eventos = listar_eventos_por_usuario(
+            st.session_state.user_id
+        )
+    except Exception as e:
+        st.error(f"Erro ao carregar eventos: {e}")
+        st.session_state.eventos = []
+
+# Disciplinas Mockadas
+if "disciplinas" not in st.session_state:
+    st.session_state.disciplinas = [
+        {'nome': 'Matemática', 'faltas': 3, 'total': 40},
+        {'nome': 'História', 'faltas': 6, 'total': 40},
+    ]
+
+if "pagina_atual" not in st.session_state:
+    st.session_state.pagina_atual = "Calendário"
+
+# Renderizar sidebar e capturar opção selecionada
+opcao_menu = render_sidebar()
+
+if st.session_state.get("pagina_atual") == "👤 Perfil":
+    render_perfil_page()
+else:
+    st.session_state.pagina_atual = opcao_menu
+    
+    # Conteúdo do Calendário
+    if opcao_menu == "Calendário":
+        # Botões etc só do calendário
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            st.title("Agenda Universitária")
+        with col2:
+            if st.button("➕ Adicionar Evento"):
+                st.session_state.modo = "criar"
+                st.session_state.data_temp = datetime.now().strftime("%Y-%m-%d")
+        
+        # Renderiza o calendário
+        callback = render_calendar()
+        handle_callback(callback)
+        
+        # Mostra formulário se estiver em modo criar/editar
+        if st.session_state.get("modo") in ["criar", "editar"]:
+            titulo_expander = "➕ Novo Evento" if st.session_state.get("modo") == "criar" else "✏️ Editar Evento"
+            with st.expander(titulo_expander, expanded=True):
+                show_event_form()
+
+    # Conteúdo do Resumo do Dia
+    elif opcao_menu == "Resumo do Dia":
+        st.title("Resumo do Dia")
+        
+        hoje = datetime.now().strftime("%Y-%m-%d")
+        eventos_hoje = [e for e in st.session_state.eventos if e.get('date') == hoje]
+        
+        st.markdown("###  Eventos de Hoje")
+        if eventos_hoje:
+            for evt in eventos_hoje:
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                     padding: 15px; border-radius: 10px; margin: 10px 0; color: white;">
+                    <h4 style="margin: 0;">{evt['title']}</h4>
+                    <p style="margin: 5px 0;"> {evt.get('start_time')} - {evt.get('end_time')}</p>
+                    <p style="margin: 0;"> {evt.get('local', 'Sem local definido')}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Nenhum evento para hoje")
+        
+        st.markdown("###  Aulas de Hoje")
+        for disc in st.session_state.disciplinas[:3]:
+            porcentagem = (disc['faltas'] / disc['total']) * 100
+            cor_borda = "#e74c3c" if porcentagem > 20 else "#2ecc71"
+            st.markdown(f"""
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; 
+                 margin: 8px 0; border-left: 4px solid {cor_borda}; color: #212529;">
+                <p style="margin: 0; color: #495057;"><strong>{disc['nome']}</strong> - Faltas: {disc['faltas']}/{disc['total']}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # Conteúdo de Minhas Disciplinas
+    elif opcao_menu == "Minhas Disciplinas":
+        st.title("Minhas Disciplinas")
+        
+        for disc in st.session_state.disciplinas:
+            porcentagem = (disc['faltas'] / disc['total']) * 100
+            cor = "🔴" if porcentagem > 20 else "🟢"
+            cor_borda = "#e74c3c" if porcentagem > 20 else "#2ecc71"
+            
+            st.markdown(f"""
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; 
+                 margin: 12px 0; border-left: 5px solid {cor_borda}; color: #212529;">
+                <h3 style="color: #343a40; margin-top: 0;">{cor} {disc['nome']}</h3>
+                <p style="color: #495057; font-size: 18px; margin-bottom: 0;">
+                    Faltas: <strong>{disc['faltas']}/{disc['total']}</strong> ({porcentagem:.1f}%)
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # Rodapé
+    st.markdown("---")
+    st.caption(
+        f"Total de eventos: {len(st.session_state.eventos)} | "
+        "Clique no dia → criar | Clique no evento → editar/excluir"
+    )
+

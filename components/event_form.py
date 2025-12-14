@@ -6,9 +6,9 @@ from utils.calendar_utils import CORES
 from utils.api_events import (
     criar_evento,
     atualizar_evento,
-    excluir_evento
+    excluir_evento,
+    listar_eventos_por_usuario
 )
-
 
 # --------------------------------------------------
 # Utilitário
@@ -80,13 +80,6 @@ def show_event_form():
 
         cor_atual = evento.get("cor", list(CORES.values())[0])
 
-        tipo_evento = st.selectbox(
-            "Tipo de evento",
-            options=list(CORES.keys()),
-            index=list(CORES.values()).index(cor_atual)
-            if cor_atual in CORES.values() else 0
-        )
-
         # 🎨 Color picker livre
         cor_escolhida = st.color_picker(
             "Cor do evento",
@@ -118,13 +111,16 @@ def show_event_form():
             return
 
         payload = {
-            "id": evento.get("id") or str(uuid.uuid4()),
-            "titulo": titulo.strip(),
+            "ownerId": st.session_state.user_id,
+            "eventId": evento.get("id") or str(uuid.uuid4()),
+            "title": titulo.strip(),
+            "description": "Descrição padrão",
             "date": evento["date"],
             "start_time": inicio.strftime("%H:%M"),
             "end_time": fim.strftime("%H:%M"),
-            "local": local.strip(),
-            "cor": cor_escolhida
+            "location": local.strip(),
+            "email": "a@aluno.uece.br",
+            "color": cor_escolhida
         }
 
         # ------------------------------------------
@@ -132,8 +128,8 @@ def show_event_form():
         # ------------------------------------------
         if modo == "criar":
             try:
-                criado = criar_evento(payload)
-                st.session_state.eventos.append(criado)
+                criar_evento(payload)
+                st.session_state.eventos = listar_eventos_por_usuario(st.session_state.user_id)
                 st.success("✅ Evento criado com sucesso!")
                 _reset_form_state()
                 st.rerun()
@@ -187,7 +183,6 @@ def show_event_form():
                 except Exception as e:
                     st.error(f"Erro ao excluir evento: {e}")
                     return
-
 
 # --------------------------------------------------
 # Reset de estado

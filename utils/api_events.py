@@ -1,12 +1,12 @@
 import requests
-from pages.url import URL_BASE, USER_EVENTS, ADMIN_EVENTOS
+from pages.url import URL_BASE, USER_EVENTS, ADMIN_EVENTOS, USER_FEED
 import streamlit as st
 
 def criar_evento(evento: dict):
+    url = f"{URL_BASE}{USER_EVENTS}"
     resp = requests.post(
-        URL_BASE + USER_EVENTS,
-        json=evento,
-        timeout=10
+        url,
+        json=evento
     )
     resp.raise_for_status()
     return resp.json()
@@ -28,3 +28,17 @@ def excluir_evento(evento_id: str):
         timeout=10
     )
     resp.raise_for_status()
+
+def listar_eventos():
+    resp = requests.get(
+        URL_BASE + USER_FEED,
+        timeout=10
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+def listar_eventos_por_usuario(user_id: str):
+    url = f"{URL_BASE}{USER_FEED}/?userId={user_id}"
+    resp = requests.get(url)
+    resp.raise_for_status()
+    return resp.json()

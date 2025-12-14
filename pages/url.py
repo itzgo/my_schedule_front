@@ -15,3 +15,6 @@ AUTH_LOGIN = "/auth/login"
 
 # defult
 ROOT = "/"
+
+# IDs fixos
+USER_ID_FIXO = "qof7q2PaYUU41tzl9vv5"
