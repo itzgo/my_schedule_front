@@ -112,7 +112,7 @@ def show_event_form():
             return
 
         payload = {
-            "ownerId": st.session_state.user_id,
+            "userId": st.session_state.user_id,
             "eventId": evento.get("id") or str(uuid.uuid4()),
             "title": titulo.strip(),
             "description": "Descrição padrão",

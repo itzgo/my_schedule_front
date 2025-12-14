@@ -52,7 +52,7 @@ def to_calendar_events():
             "title": f"{titulo} ({ev['start_time']}–{ev['end_time']})",
             "start": f"{ev['date']}T{ev['start_time']}:00",
             "end": f"{ev['date']}T{ev['end_time']}:00",
-            "backgroundColor": ev.get("cor", "#95a5a6"),
+            "backgroundColor": ev.get("color", "#95a5a6"),
             "textColor": "white",
         })
     return eventos_cal
