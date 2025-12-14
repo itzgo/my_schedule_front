@@ -12,3 +12,8 @@ my_schedule_front\app.py
 my_schedule_front\app2.py
 my_schedule_front\app3.py
 my_schedule_front\eventos.json
+my_schedule_front\components\event_form1.py
+
+.venv
+credentials.txt
+__pycache__/
