@@ -5,7 +5,8 @@ from components.sidebar_menu import render_sidebar
 from pages.perfil import render_perfil_page  
 from datetime import datetime
 from pages.url import USER_ID_FIXO
-from utils.api_events import listar_eventos_por_usuario
+from utils.api_events import listar_eventos_por_usuario, listar_eventos_publicos
+from utils.event_loader import merge_eventos
 
 if "user_id" not in st.session_state:
     st.session_state.user_id = USER_ID_FIXO
@@ -115,9 +116,13 @@ st.markdown(
 # Função para buscar eventos da API
 if "eventos" not in st.session_state:
     try:
-        st.session_state.eventos = listar_eventos_por_usuario(
+        eventos_usuario = listar_eventos_por_usuario(
             st.session_state.user_id
         )
+
+        eventos_publicos = listar_eventos_publicos()
+
+        st.session_state.eventos = merge_eventos(eventos_usuario, eventos_publicos)
     except Exception as e:
         st.error(f"Erro ao carregar eventos: {e}")
         st.session_state.eventos = []

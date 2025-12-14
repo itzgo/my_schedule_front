@@ -9,6 +9,7 @@ from utils.api_events import (
     excluir_evento,
     listar_eventos_por_usuario
 )
+import utils.event_loader as recarregar_eventos
 
 # --------------------------------------------------
 # Utilitário
@@ -143,15 +144,14 @@ def show_event_form():
         # ------------------------------------------
         if modo == "editar":
             try:
-                atualizado = atualizar_evento(
+                atualizar_evento(
                     st.session_state.evento_id_selecionado,
                     payload
                 )
 
-                for i, ev in enumerate(st.session_state.eventos):
-                    if str(ev.get("id")) == str(atualizado.get("id")):
-                        st.session_state.eventos[i] = atualizado
-                        break
+                st.session_state.eventos = recarregar_eventos(
+                    st.session_state.user_id
+                )
 
                 st.success("✏️ Evento atualizado!")
                 _reset_form_state()
@@ -171,10 +171,9 @@ def show_event_form():
                 try:
                     excluir_evento(st.session_state.evento_id_selecionado)
 
-                    st.session_state.eventos = [
-                        e for e in st.session_state.eventos
-                        if str(e.get("id")) != str(st.session_state.evento_id_selecionado)
-                    ]
+                    st.session_state.eventos = recarregar_eventos(
+                        st.session_state.user_id
+                    )
 
                     st.success("🗑️ Evento excluído!")
                     _reset_form_state()

@@ -1,5 +1,5 @@
 import requests
-from pages.url import URL_BASE, USER_EVENTS, ADMIN_EVENTOS, USER_FEED
+from pages.url import *
 import streamlit as st
 
 def criar_evento(evento: dict):
@@ -29,11 +29,9 @@ def excluir_evento(evento_id: str):
     )
     resp.raise_for_status()
 
-def listar_eventos():
-    resp = requests.get(
-        URL_BASE + USER_FEED,
-        timeout=10
-    )
+def listar_eventos_publicos():
+    url = f"{URL_BASE}{ADMIN_EVENTOS_PUB}"
+    resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()
 
