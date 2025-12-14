@@ -159,12 +159,12 @@ def render_login_page():
                         st.session_state.token = user_data.get('token')  #se a API retornar token
                         
                         #debug no terminal
-                        print("=" * 60)
-                        print(" LOGIN REALIZADO:")
-                        print(f"  userId: {st.session_state.userId}")
-                        print(f"  email: {st.session_state.email}")
-                        print(f"  username: {st.session_state.username}")
-                        print("=" * 60)
+                        #print("=" * 60)
+                        #print(" LOGIN REALIZADO:")
+                        #print(f"  userId: {st.session_state.userId}")
+                        #print(f"  email: {st.session_state.email}")
+                        #print(f"  username: {st.session_state.username}")
+                        #print("=" * 60)
                         
                         st.success("Login realizado com sucesso!")
                         st.rerun()

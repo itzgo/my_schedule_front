@@ -28,12 +28,8 @@ if not st.session_state.authenticated:
     render_login_page()
     st.stop()
 
-if "user_id" not in st.session_state:
-    st.session_state.user_id = USER_ID_FIXO
-
-
-if "user_id" not in st.session_state:
-    st.session_state.user_id = USER_ID_FIXO
+if "userId" not in st.session_state:
+    st.session_state.userId = USER_ID_FIXO
 
 # Configuracoes
 st.set_page_config(
@@ -141,7 +137,7 @@ st.markdown(
 if "eventos" not in st.session_state:
     try:
         eventos_usuario = listar_eventos_por_usuario(
-            st.session_state.user_id
+            st.session_state.userId
         )
 
         eventos_publicos = listar_eventos_publicos()
