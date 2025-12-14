@@ -5,8 +5,32 @@ from components.sidebar_menu import render_sidebar
 from pages.perfil import render_perfil_page  
 from datetime import datetime
 from pages.url import USER_ID_FIXO
+from pages.login import render_login_page
 from utils.api_events import listar_eventos_por_usuario, listar_eventos_publicos
 from utils.event_loader import merge_eventos
+
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.markdown(
+        """
+        <style>
+            [data-testid="stSidebar"] {
+                display: none;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    render_login_page()
+    st.stop()
+
+if "user_id" not in st.session_state:
+    st.session_state.user_id = USER_ID_FIXO
+
 
 if "user_id" not in st.session_state:
     st.session_state.user_id = USER_ID_FIXO
