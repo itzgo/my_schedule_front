@@ -8,6 +8,8 @@ ADMIN_EVENTOS_PUB = "/api/admin/events/public"
 # events
 USER_FEED = "/my_schedule/feed"
 USER_EVENTS = "/my_schedule/create_event"
+UPDATE_EVENT = "/my_schedule/update_event"
+DELETE_EVENT = "/my_schedule/delete_event"
 
 # login
 AUTH_LOGIN = "/auth/login"

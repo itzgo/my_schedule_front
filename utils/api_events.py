@@ -1,9 +1,11 @@
 import requests
-from pages.url import *
-import streamlit as st
+import pages.url as urls
+
+#print("ARQUIVO url.py CARREGADO:", urls.__file__)
+#print("ATRIBUTOS:", dir(urls))
 
 def criar_evento(evento: dict):
-    url = f"{URL_BASE}{USER_EVENTS}"
+    url = f"{urls.URL_BASE}{urls.USER_EVENTS}"
     resp = requests.post(
         url,
         json=evento
@@ -12,9 +14,9 @@ def criar_evento(evento: dict):
     return resp.json()
 
 
-def atualizar_evento(evento_id: str, evento: dict):
+def atualizar_evento(evento: dict):
     resp = requests.put(
-        f"{URL_BASE}{ADMIN_EVENTOS}/{evento_id}",
+        f"{urls.URL_BASE}{urls.UPDATE_EVENT}",
         json=evento,
         timeout=10
     )
@@ -22,21 +24,27 @@ def atualizar_evento(evento_id: str, evento: dict):
     return resp.json()
 
 
-def excluir_evento(evento_id: str):
+def excluir_evento(event_id: str, user_id: str):
+    payload = {
+        "eventId": event_id,
+        "userId": user_id
+    }
+
     resp = requests.delete(
-        f"{URL_BASE}{ADMIN_EVENTOS}/{evento_id}",
+        f"{urls.URL_BASE}{urls.DELETE_EVENT}",
+        json=payload,
         timeout=10
     )
     resp.raise_for_status()
 
 def listar_eventos_publicos():
-    url = f"{URL_BASE}{ADMIN_EVENTOS_PUB}"
+    url = f"{urls.URL_BASE}{urls.ADMIN_EVENTOS_PUB}"
     resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()
 
 def listar_eventos_por_usuario(user_id: str):
-    url = f"{URL_BASE}{USER_FEED}/?userId={user_id}"
+    url = f"{urls.URL_BASE}{urls.USER_FEED}/?userId={user_id}"
     resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()

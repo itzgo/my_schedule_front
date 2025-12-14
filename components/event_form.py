@@ -9,7 +9,7 @@ from utils.api_events import (
     excluir_evento,
     listar_eventos_por_usuario
 )
-import utils.event_loader as recarregar_eventos
+from utils.event_loader import recarregar_eventos
 
 # --------------------------------------------------
 # Utilitário
@@ -112,7 +112,7 @@ def show_event_form():
             return
 
         payload = {
-            "userId": st.session_state.user_id,
+            "userId": st.session_state.userId,
             "eventId": evento.get("id") or str(uuid.uuid4()),
             "title": titulo.strip(),
             "description": "Descrição padrão",
@@ -130,7 +130,7 @@ def show_event_form():
         if modo == "criar":
             try:
                 criar_evento(payload)
-                st.session_state.eventos = listar_eventos_por_usuario(st.session_state.user_id)
+                st.session_state.eventos = listar_eventos_por_usuario(st.session_state.userId)
                 st.success("✅ Evento criado com sucesso!")
                 _reset_form_state()
                 st.rerun()
@@ -145,12 +145,11 @@ def show_event_form():
         if modo == "editar":
             try:
                 atualizar_evento(
-                    st.session_state.evento_id_selecionado,
                     payload
                 )
 
                 st.session_state.eventos = recarregar_eventos(
-                    st.session_state.user_id
+                    st.session_state.userId
                 )
 
                 st.success("✏️ Evento atualizado!")
@@ -166,22 +165,29 @@ def show_event_form():
     # ----------------------------------------------
     if modo == "editar":
         st.markdown("---")
-        if st.button("🗑️ Excluir evento", type="secondary"):
-            if st.checkbox("Sim, desejo excluir este evento permanentemente"):
-                try:
-                    excluir_evento(st.session_state.evento_id_selecionado)
+        st.subheader("Excluir evento")
 
-                    st.session_state.eventos = recarregar_eventos(
-                        st.session_state.user_id
-                    )
+        confirmar = st.checkbox(
+            "Sim, desejo excluir este evento permanentemente"
+        )
 
-                    st.success("🗑️ Evento excluído!")
-                    _reset_form_state()
-                    st.rerun()
+        if st.button("🗑️ Excluir evento", type="secondary", disabled=not confirmar):
+            try:
+                excluir_evento(
+                    st.session_state.evento_id_selecionado,
+                    st.session_state.userId
+                )
 
-                except Exception as e:
-                    st.error(f"Erro ao excluir evento: {e}")
-                    return
+                st.session_state.eventos = recarregar_eventos(
+                    st.session_state.userId
+                )
+
+                st.success("🗑️ Evento excluído com sucesso!")
+                _reset_form_state()
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"Erro ao excluir evento: {e}")
 
 # --------------------------------------------------
 # Reset de estado
