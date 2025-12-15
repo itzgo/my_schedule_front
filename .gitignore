@@ -17,3 +17,4 @@ my_schedule_front\components\event_form1.py
 .venv
 credentials.txt
 __pycache__/
+bash.exe.stackdump
