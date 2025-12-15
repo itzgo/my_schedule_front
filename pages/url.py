@@ -14,8 +14,11 @@ DELETE_EVENT = "/my_schedule/delete_event"
 # login
 AUTH_LOGIN = "/auth/login"
 
+# profile
+USER_PROFILE = "/my_schedule/profile/"
+
 # defult
 ROOT = "/"
 
 # IDs fixos
-USER_ID_FIXO = "qof7q2PaYUU41tzl9vv5"
+USER_ID_FIXO = "guc0Jt4ogLFLXv8uZfrt"

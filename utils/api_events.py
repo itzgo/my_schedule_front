@@ -38,7 +38,8 @@ def excluir_evento(event_id: str, user_id: str):
     resp.raise_for_status()
 
 def listar_eventos_publicos():
-    url = f"{urls.URL_BASE}{urls.ADMIN_EVENTOS_PUB}"
+    user_id = urls.USER_ID_FIXO
+    url = f"{urls.URL_BASE}{urls.USER_FEED}/?userId={user_id}"
     resp = requests.get(url)
     resp.raise_for_status()
     return resp.json()
@@ -46,5 +47,13 @@ def listar_eventos_publicos():
 def listar_eventos_por_usuario(user_id: str):
     url = f"{urls.URL_BASE}{urls.USER_FEED}/?userId={user_id}"
     resp = requests.get(url)
+    resp.raise_for_status()
+    return resp.json()
+
+def obter_perfil_usuario(user_id: str):
+    resp = requests.get(
+        f"{urls.URL_BASE}{urls.USER_PROFILE}{user_id}",
+        timeout=10
+    )
     resp.raise_for_status()
     return resp.json()
